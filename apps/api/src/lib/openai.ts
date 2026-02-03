@@ -5,9 +5,10 @@ const openai = new OpenAI({
 });
 
 export async function transcribeAudio(audioBuffer: Buffer): Promise<string> {
-  // Convert Buffer to Uint8Array for File constructor compatibility
-  const uint8Array = new Uint8Array(audioBuffer);
-  const file = new File([uint8Array], 'audio.m4a', { type: 'audio/m4a' });
+  // Create a File-like object that OpenAI SDK accepts
+  // Using webm format since that's what browsers record
+  const blob = new Blob([audioBuffer], { type: 'audio/webm' });
+  const file = new File([blob], 'audio.webm', { type: 'audio/webm' });
 
   const transcription = await openai.audio.transcriptions.create({
     file,

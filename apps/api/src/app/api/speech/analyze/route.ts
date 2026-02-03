@@ -28,12 +28,9 @@ export async function POST(request: NextRequest) {
     // Convert base64 to buffer
     const audioBuffer = Buffer.from(audio, 'base64');
 
-    // Transcribe with Whisper
-    let transcription: string;
-    try {
-      transcription = await transcribeAudio(audioBuffer);
-    } catch (e) {
-      console.error('Transcription error:', e);
+    // Check if we have valid audio data
+    if (audioBuffer.length < 1000) {
+      console.error('Audio buffer too small:', audioBuffer.length);
       return Response.json({
         success: true,
         data: {
@@ -41,7 +38,42 @@ export async function POST(request: NextRequest) {
           pronunciationScore: 0,
           grammarScore: 0,
           fluencyScore: 0,
-          feedback: 'Could not transcribe audio. Please try again.',
+          feedback: 'Recording was too short. Please hold the button and speak clearly.',
+          pronunciationIssues: [],
+          grammarIssues: [],
+        },
+      });
+    }
+
+    // Transcribe with Whisper
+    let transcription: string;
+    try {
+      transcription = await transcribeAudio(audioBuffer);
+
+      if (!transcription || transcription.trim() === '') {
+        return Response.json({
+          success: true,
+          data: {
+            transcription: '',
+            pronunciationScore: 0,
+            grammarScore: 0,
+            fluencyScore: 0,
+            feedback: 'No speech detected. Please speak louder and more clearly.',
+            pronunciationIssues: [],
+            grammarIssues: [],
+          },
+        });
+      }
+    } catch (e: any) {
+      console.error('Transcription error:', e?.message || e);
+      return Response.json({
+        success: true,
+        data: {
+          transcription: '',
+          pronunciationScore: 0,
+          grammarScore: 0,
+          fluencyScore: 0,
+          feedback: 'Could not process audio. Please try again and speak clearly.',
           pronunciationIssues: [],
           grammarIssues: [],
         },
