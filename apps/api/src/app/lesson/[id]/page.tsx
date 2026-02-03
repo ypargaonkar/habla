@@ -19,10 +19,37 @@ export default function LessonPage() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const [feedback, setFeedback] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
+
+  function speakText(text: string) {
+    if ('speechSynthesis' in window) {
+      // Cancel any ongoing speech
+      window.speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'es-ES';
+      utterance.rate = 0.9; // Slightly slower for learning
+
+      // Try to find a Spanish voice
+      const voices = window.speechSynthesis.getVoices();
+      const spanishVoice = voices.find(v => v.lang.startsWith('es'));
+      if (spanishVoice) {
+        utterance.voice = spanishVoice;
+      }
+
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
+
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert('Text-to-speech is not supported in your browser');
+    }
+  }
 
   useEffect(() => {
     fetchLesson();
@@ -177,7 +204,7 @@ export default function LessonPage() {
               <p className="text-sm text-gray-500 mt-2">{feedback.feedback}</p>
             </div>
 
-            <div className="bg-white border rounded-xl p-5 mb-8">
+            <div className="bg-white border rounded-xl p-5 mb-4">
               <div className="flex justify-between items-center">
                 <span className="font-medium">Grammar</span>
                 {feedback.grammarScore === 100 ? (
@@ -187,6 +214,16 @@ export default function LessonPage() {
                 )}
               </div>
             </div>
+
+            <button
+              onClick={() => speakText(currentExercise?.expectedResponse || currentExercise?.prompt || '')}
+              disabled={isSpeaking}
+              className={`w-full py-3 mb-4 border rounded-xl font-medium flex items-center justify-center gap-2 ${
+                isSpeaking ? 'bg-accent text-white' : 'hover:bg-gray-50'
+              }`}
+            >
+              🔊 {isSpeaking ? 'Playing...' : 'Hear Native Pronunciation'}
+            </button>
 
             <div className="flex gap-3">
               <button
@@ -207,7 +244,15 @@ export default function LessonPage() {
           /* Exercise View */
           <>
             <div className="text-center mb-12">
-              <button className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mb-6 mx-auto hover:bg-gray-200">
+              <button
+                onClick={() => speakText(currentExercise?.prompt || '')}
+                disabled={isSpeaking}
+                className={`w-14 h-14 rounded-full flex items-center justify-center mb-6 mx-auto transition-all ${
+                  isSpeaking
+                    ? 'bg-accent text-white animate-pulse'
+                    : 'bg-gray-100 hover:bg-gray-200'
+                }`}
+              >
                 🔊
               </button>
               <p className="text-2xl font-semibold mb-2">
