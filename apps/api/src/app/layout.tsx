@@ -1,6 +1,8 @@
+import './globals.css';
+
 export const metadata = {
-  title: 'Habla API',
-  description: 'Spanish learning app backend',
+  title: 'Habla - Learn Spanish',
+  description: 'Conversational Spanish learning app',
 };
 
 export default function RootLayout({
@@ -10,7 +12,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="bg-background min-h-screen">{children}</body>
     </html>
   );
 }
