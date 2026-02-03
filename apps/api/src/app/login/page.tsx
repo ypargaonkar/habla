@@ -28,75 +28,91 @@ export default function LoginPage() {
         localStorage.setItem('token', data.data.token);
         router.push('/');
       } else {
-        setError(data.error || 'Login failed');
+        setError(data.error || 'Invalid email or password');
       }
     } catch (e) {
-      setError('Something went wrong');
+      setError('Something went wrong. Please try again.');
     }
     setLoading(false);
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link href="/" className="text-2xl font-bold">
-            Habla
-          </Link>
-        </div>
+    <div className="min-h-screen flex flex-col bg-background">
+      {/* Header */}
+      <header className="px-6 py-5">
+        <Link href="/" className="flex items-center gap-2 w-fit">
+          <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center">
+            <span className="text-white text-xl font-bold">H</span>
+          </div>
+          <span className="text-xl font-bold tracking-tight">Habla</span>
+        </Link>
+      </header>
 
-        <div className="bg-white border rounded-xl p-8">
-          <h1 className="text-2xl font-semibold mb-2">Welcome back</h1>
-          <p className="text-gray-500 mb-6">Sign in to continue learning</p>
+      {/* Main */}
+      <main className="flex-1 flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold tracking-tight mb-2">Welcome back</h1>
+            <p className="text-muted">Sign in to continue learning Spanish</p>
+          </div>
 
-          {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm">
-              {error}
-            </div>
-          )}
+          <div className="bg-white rounded-2xl border border-border p-8 shadow-soft">
+            {error && (
+              <div className="bg-error-light border border-error/20 text-error px-4 py-3 rounded-xl mb-6 text-sm">
+                {error}
+              </div>
+            )}
 
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
-                placeholder="you@example.com"
-                required
-              />
-            </div>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label className="block text-sm font-medium mb-2">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-3 bg-gray-50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                  placeholder="you@example.com"
+                  required
+                />
+              </div>
 
-            <div className="mb-6">
-              <label className="block text-sm font-medium mb-2">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
-                placeholder="••••••••"
-                required
-              />
-            </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 bg-gray-50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-accent text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50"
-            >
-              {loading ? 'Signing in...' : 'Sign In'}
-            </button>
-          </form>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-4 bg-accent text-white rounded-xl font-semibold hover:bg-accent-hover disabled:opacity-50 transition-all"
+              >
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Signing in...
+                  </span>
+                ) : (
+                  'Sign In'
+                )}
+              </button>
+            </form>
+          </div>
 
-          <p className="text-center mt-6 text-gray-500">
+          <p className="text-center mt-8 text-muted">
             Don't have an account?{' '}
-            <Link href="/signup" className="text-accent hover:underline">
-              Sign up
+            <Link href="/signup" className="text-accent font-medium hover:underline">
+              Sign up for free
             </Link>
           </p>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
